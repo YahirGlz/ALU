@@ -24,7 +24,7 @@ module op6(input [31:0]A, input [31:0]B, output reg [31:0]R);
   assign R=A<B?1:0;
 endmodule
 
-module ALU_BLOQUEO(input [31:0]X, input [31:0]Y, input [2:0]s, input clk, output reg [31:0]r);
+module ALU_BLOQUEO(input [31:0]X, input [31:0]Y, input [2:0]s, input clk, output reg [31:0]r, output reg Zflag);
   wire [31:0]w[5:0];
   op1 ope1(.A(X), .B(Y), .R(w[0]));
   op2 ope2(.A(X), .B(Y), .R(w[1]));
@@ -53,10 +53,12 @@ module ALU_BLOQUEO(input [31:0]X, input [31:0]Y, input [2:0]s, input clk, output
 	    r = w[5];
 	  end  
 	endcase
+	if(r==0) Zflag=1;
+	else Zflag=0;
   end
 endmodule
 
-module ALU_SIN_BLOQUEO(input [31:0]X, input [31:0]Y, input [2:0]s, input clk, output reg [31:0]r);
+module ALU_SIN_BLOQUEO(input [31:0]X, input [31:0]Y, input [2:0]s, input clk, output reg [31:0]r, output reg Zflag);
   wire [31:0]w[5:0];
   op1 ope1(.A(X), .B(Y), .R(w[0]));
   op2 ope2(.A(X), .B(Y), .R(w[1]));
@@ -85,6 +87,8 @@ module ALU_SIN_BLOQUEO(input [31:0]X, input [31:0]Y, input [2:0]s, input clk, ou
 	    r <= w[5];
 	  end  
 	endcase
+	if(r==0) Zflag=1;
+	else Zflag=0;
   end
 endmodule
 
@@ -93,8 +97,9 @@ module ALU_TB();
   reg  [2:0] s_TB;
   wire [31:0]r_TB_B, r_TB_SB;
   reg  clk_TB;  
-  ALU_BLOQUEO alu1(.X(X_TB), .Y(Y_TB), .s(s_TB), .clk(clk_TB), .r(r_TB_B));
-  ALU_SIN_BLOQUEO alu2(.X(X_TB), .Y(Y_TB), .s(s_TB), .clk(clk_TB), .r(r_TB_SB));
+  wire Z_TB;  
+  ALU_BLOQUEO alu1(.X(X_TB), .Y(Y_TB), .s(s_TB), .clk(clk_TB), .r(r_TB_B), .Zflag(Z_TB));
+  ALU_SIN_BLOQUEO alu2(.X(X_TB), .Y(Y_TB), .s(s_TB), .clk(clk_TB), .r(r_TB_SB), .Zflag(Z_TB));
   
   integer i;
   initial begin
